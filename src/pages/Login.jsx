@@ -1,43 +1,39 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import { createUser } from '../services/userAPI';
 import { Loading } from './Loading';
 
 export class Login extends Component {
   state = {
-    name: '',
     isLoading: false,
     shouldRedirect: false,
   };
 
-  onChangeHandler = ({ target }) => {
-    const { value, name } = target;
-    this.setState({ [name]: value });
-  };
-
   onClickHandler = async () => {
-    const { name } = this.state;
+    const { name } = this.props;
     this.setState({ isLoading: true });
     await createUser({ name });
     this.setState({ isLoading: false, shouldRedirect: true });
   };
 
   render() {
-    const { name, isLoading, shouldRedirect } = this.state;
+    const { isLoading, shouldRedirect } = this.state;
+    const { onChangeHandler, name } = this.props;
     const min = 3;
 
     if (shouldRedirect) {
-      this.setState({ shouldRedirect: false });
       return <Redirect to="/search" />;
+    } if (isLoading) {
+      return <Loading />;
     }
     return (
       <div data-testid="page-login">
         <input
-          name="name"
           data-testid="login-name-input"
           type="text"
           id="login"
-          onChange={ this.onChangeHandler }
+          onChange={ onChangeHandler }
         />
         <button
           data-testid="login-submit-button"
@@ -48,10 +44,16 @@ export class Login extends Component {
         >
           Entrar
         </button>
-        {isLoading ? <Loading /> : null }
       </div>
     );
   }
 }
+
+Login.defaultProps = { name: '', onChangeHandler: () => {} };
+
+Login.propTypes = {
+  name: PropTypes.string,
+  onChangeHandler: PropTypes.func,
+};
 
 export default Login;

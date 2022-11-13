@@ -7,13 +7,33 @@ import { Favorites } from './pages/Favorites';
 import { Profile } from './pages/Profile';
 import { ProfileEdit } from './pages/ProfileEdit';
 import { NotFound } from './pages/NotFound';
+import { Header } from './pages/Header/Header';
 
 class App extends Component {
+  state = {
+    name: '',
+  };
+
+  onChangeHandler = ({ target }) => {
+    const { value } = target;
+    this.setState({ name: value });
+  };
+
   render() {
+    const { name } = this.state;
     return (
       <div className="app">
+        <Header user={ name } />
         <Switch>
-          <Route exact path="/" component={ Login } />
+          <Route
+            exact
+            path="/"
+            render={ (props) => (<Login
+              { ...props }
+              onChangeHandler={ this.onChangeHandler }
+              name={ name }
+            />) }
+          />
           <Route exact path="/search" component={ Search } />
           <Route path="/album/:id" component={ Album } />
           <Route exact path="/favorites" component={ Favorites } />
