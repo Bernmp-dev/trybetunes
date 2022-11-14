@@ -41,7 +41,7 @@ export class Login extends Component {
           type="button"
           id="login"
           disabled={ name.length < min }
-          onClick={ this.onClickHandler }
+          onClick={ () => this.onClickHandler() }
         >
           Entrar
         </button>
