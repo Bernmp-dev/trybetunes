@@ -5,7 +5,11 @@ import { Loading } from '../Loading';
 import './Header.css';
 
 export class Header extends Component {
-  state = { user: {}, isLoading: false };
+  constructor(props) {
+    super(props);
+
+    this.state = { user: {}, isLoading: false };
+  }
 
   async componentDidMount() {
     this.setState({ isLoading: true });

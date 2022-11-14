@@ -12,15 +12,16 @@ import { Header } from './pages/Header/Header';
 class App extends Component {
   state = {
     name: '',
+    artist: '',
   };
 
   onChangeHandler = ({ target }) => {
-    const { value } = target;
-    this.setState({ name: value });
+    const { value, name } = target;
+    this.setState({ [name]: value });
   };
 
   render() {
-    const { name } = this.state;
+    const { name, artist } = this.state;
     return (
       <div className="app">
         <Header user={ name } />
@@ -34,7 +35,15 @@ class App extends Component {
               name={ name }
             />) }
           />
-          <Route exact path="/search" component={ Search } />
+          <Route
+            exact
+            path="/search"
+            render={ (props) => (<Search
+              { ...props }
+              onChangeHandler={ this.onChangeHandler }
+              artist={ artist }
+            />) }
+          />
           <Route path="/album/:id" component={ Album } />
           <Route exact path="/favorites" component={ Favorites } />
           <Route exact path="/profile" component={ Profile } />

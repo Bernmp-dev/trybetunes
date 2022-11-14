@@ -30,6 +30,7 @@ export class Login extends Component {
     return (
       <div data-testid="page-login">
         <input
+          name="name"
           data-testid="login-name-input"
           type="text"
           id="login"
