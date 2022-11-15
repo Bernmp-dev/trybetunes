@@ -12,7 +12,6 @@ export class Album extends Component {
     const data = await getMusics(id);
     this.setState({ musicIndex: data });
 
-
     const response = await getFavoriteSongs();
     console.log(response);
 
