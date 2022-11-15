@@ -5,7 +5,7 @@ import { addSong } from '../services/favoriteSongsAPI';
 import { Loading } from './Loading';
 
 export class Album extends Component {
-  state = { isLoading: false, musicIndex: [], favCheck: [], favSongsId: [] };
+  state = { isLoading: false, musicIndex: [], favCheck: [] };
 
   async componentDidMount() {
     const { match: { params: { id } } } = this.props;
@@ -22,7 +22,6 @@ export class Album extends Component {
     const { name, checked } = target;
     const { musicIndex, favCheck } = this.state;
     const selectedSong = musicIndex.find(({ trackName }) => trackName === name);
-    console.log(Array.prototype.indexOf.call(musicIndex, selectedSong));
 
     this.setState({ favCheck: { [name]: checked, ...favCheck } });
 
