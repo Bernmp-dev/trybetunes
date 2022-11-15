@@ -9,15 +9,19 @@ export class Album extends Component {
 
   async componentDidMount() {
     const { match: { params: { id } } } = this.props;
-
     const data = await getMusics(id);
+    this.setState({ musicIndex: data });
+
+
     const response = await getFavoriteSongs();
     console.log(response);
 
-    // const retrieved = response.map(({ trackName }) => ({ [trackName]: true }))
-    //   .reduce((acc, curr) => ({ ...acc, ...curr }));
-
-    this.setState({ musicIndex: data });
+    if (response.length > 0) {
+      const retrieved = response.map(({ trackName }) => ({ [trackName]: true }))
+        .reduce((acc, curr) => ({ ...acc, ...curr }));
+      this.setState({ favCheck: { ...retrieved } });
+      console.log(retrieved);
+    }
   }
 
   checkFavorite = async ({ target }) => {
