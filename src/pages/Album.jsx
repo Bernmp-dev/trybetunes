@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import getMusics from '../services/musicsAPI';
-import { addSong } from '../services/favoriteSongsAPI';
+import { addSong, getFavoriteSongs } from '../services/favoriteSongsAPI';
 import { Loading } from './Loading';
 
 export class Album extends Component {
@@ -9,28 +9,27 @@ export class Album extends Component {
 
   async componentDidMount() {
     const { match: { params: { id } } } = this.props;
+
     const data = await getMusics(id);
+    const response = await getFavoriteSongs();
+    console.log(response);
+
+    // const retrieved = response.map(({ trackName }) => ({ [trackName]: true }))
+    //   .reduce((acc, curr) => ({ ...acc, ...curr }));
+
     this.setState({ musicIndex: data });
   }
-
-  // shouldComponentUpdate(nextP, nextS) {
-  //   const { favCheck } = this.state;
-  //   return (favCheck === nextS.favCheck);
-  // }
 
   checkFavorite = async ({ target }) => {
     const { name, checked } = target;
     const { musicIndex, favCheck } = this.state;
     const selectedSong = musicIndex.find(({ trackName }) => trackName === name);
 
-    this.setState({ favCheck: { [name]: checked, ...favCheck } });
+    this.setState({ favCheck: { ...favCheck, [name]: checked } });
 
     this.setState({ isLoading: true });
     await addSong(selectedSong);
     this.setState({ isLoading: false });
-
-    console.log(favCheck);
-    console.log(name);
     // console.log(Array.prototype.indexOf.call(favCheck, selectedSong));
   };
 
@@ -66,12 +65,12 @@ export class Album extends Component {
               <code>audio</code>
               .
             </audio>
-            <label htmlFor="Favorita">
+            <label htmlFor={ trackId }>
               <input
                 data-testid={ `checkbox-music-${trackId}` }
                 type="checkbox"
                 name={ trackName }
-                id="Favorita"
+                id={ trackId }
                 onChange={ (e) => this.checkFavorite(e) }
                 checked={ favCheck[trackName] }
               />
@@ -80,13 +79,12 @@ export class Album extends Component {
         )));
     };
 
-    return (isLoading
-      ? <Loading /> : (
-        <div data-testid="page-album">
-          {template}
-          {musicTemplate()}
-        </div>
-      ));
+    return (
+      <div data-testid="page-album">
+        {template}
+        {(isLoading) ? <Loading /> : musicTemplate()}
+      </div>
+    );
   }
 }
 
