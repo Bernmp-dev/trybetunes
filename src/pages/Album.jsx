@@ -1,39 +1,56 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import getMusics from '../services/musicsAPI';
-import { addSong, getFavoriteSongs } from '../services/favoriteSongsAPI';
+import { addSong, getFavoriteSongs, removeSong } from '../services/favoriteSongsAPI';
 import { Loading } from './Loading';
 
 export class Album extends Component {
-  state = { isLoading: false, musicIndex: [], favCheck: [] };
+  state = { isLoading: false, musicIndex: [], favCheck: [], storedFavorites: [] };
 
   async componentDidMount() {
     const { match: { params: { id } } } = this.props;
+
     const data = await getMusics(id);
     this.setState({ musicIndex: data });
 
     const response = await getFavoriteSongs();
-    console.log(response);
+    this.setState({ storedFavorites: { ...response } });
 
     if (response.length > 0) {
       const retrieved = response.map(({ trackName }) => ({ [trackName]: true }))
         .reduce((acc, curr) => ({ ...acc, ...curr }));
       this.setState({ favCheck: { ...retrieved } });
-      console.log(retrieved);
     }
   }
 
-  checkFavorite = async ({ target }) => {
-    const { name, checked } = target;
-    const { musicIndex, favCheck } = this.state;
+  checkFavorite = async ({ target: { name, checked } }) => {
+    const { musicIndex, favCheck, storedFavorites } = this.state;
     const selectedSong = musicIndex.find(({ trackName }) => trackName === name);
+    console.log(selectedSong);
 
     this.setState({ favCheck: { ...favCheck, [name]: checked } });
 
     this.setState({ isLoading: true });
     await addSong(selectedSong);
-    this.setState({ isLoading: false });
-    // console.log(Array.prototype.indexOf.call(favCheck, selectedSong));
+    const response = await getFavoriteSongs();
+    this.setState({ isLoading: false,
+      storedFavorites: { ...storedFavorites, ...response } });
+
+    const selectedFav = Object.values(storedFavorites)
+      .find((curr) => curr.trackName.includes(name));
+
+    const remByClick = Object.values(storedFavorites)
+      .filter(({ trackName }) => trackName !== name);
+
+    if (selectedFav) {
+      this.setState({ isLoading: true, storedFavorites: { ...remByClick } });
+      await removeSong(selectedFav);
+      this.setState({ isLoading: false });
+    }
+
+    //   const newFav = Object.entries(storedFavorites)
+    //     .map((curr) => ({ [curr[0]]: curr[1] }))
+    //     .reduce((acc, curr) => ({ ...acc, ...curr }));
   };
 
   render() {
