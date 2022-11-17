@@ -24,7 +24,16 @@ const simulateRequest = (response) => (callback) => {
 };
 
 export const getFavoriteSongs = () => new Promise((resolve) => {
-  const favoriteSongs = readFavoriteSongs();
+  const favoriteSongs = readFavoriteSongs().map(({ trackName,
+    trackNumber, trackId, previewUrl, collectionName, artworkUrl100,
+    artistName }) => (
+    { trackName,
+      trackNumber,
+      trackId,
+      previewUrl,
+      collectionName,
+      artworkUrl100,
+      artistName }));
   simulateRequest(favoriteSongs)(resolve);
 });
 
