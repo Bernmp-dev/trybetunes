@@ -12,12 +12,13 @@ export class Favorites extends Component {
     this.setState({ storedFavs: response, isLoading: false });
   }
 
-  // shouldComponentUpdate(nexp, nexts) {
-  //   const { storedFavs } = this.state;
-  //   const newValue = (obj) => Object.values(obj);
-
-  //   return newValue(storedFavs).length === 0;
-  // }
+  async componentDidUpdate(prevp, prevs) {
+    const { storedFavs } = this.state;
+    if (storedFavs !== prevs.storedFavs) {
+      const response = await getFavoriteSongs();
+      this.setState({ storedFavs: response });
+    }
+  }
 
   render() {
     const { storedFavs, isLoading } = this.state;
