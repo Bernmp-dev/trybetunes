@@ -5,7 +5,7 @@ export class NotFound extends Component {
   render() {
     const { match: { params: { not } } } = this.props;
     return (
-      <div data-testid="page-not-found">{`${not} NotFound`}</div>
+      <span data-testid="page-not-found">{`${not} NotFound`}</span>
     );
   }
 }

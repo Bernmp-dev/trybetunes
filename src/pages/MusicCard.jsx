@@ -4,23 +4,14 @@ import { addSong, getFavoriteSongs, removeSong } from '../services/favoriteSongs
 import { Loading } from './Loading';
 
 export class MusicCard extends Component {
-  state = { isLoading: false,
-    favCheck: [],
-    storedFavorites: [],
-  };
+  state = { isLoading: false, storedFavorites: [] };
 
   async componentDidMount() {
     const response = await getFavoriteSongs();
     this.setState({ storedFavorites: response });
-
-    if (response.length > 0) {
-      const retrieved = response.map(({ trackName }) => ({ [trackName]: true }))
-        .reduce((acc, curr) => ({ ...acc, ...curr }));
-      this.setState({ favCheck: { ...retrieved } });
-    }
   }
 
-  async componentDidUpdate(prevp, prevs) {
+  async componentDidUpdate(__, prevs) {
     const { storedFavorites } = this.state;
     if (storedFavorites !== prevs.storedFavorites) {
       const response = await getFavoriteSongs();
@@ -28,26 +19,30 @@ export class MusicCard extends Component {
     }
   }
 
-  checkFavorite = async ({ target: { name, checked } }) => {
-    const { favCheck, storedFavorites } = this.state;
+  favChecker = (track) => {
+    const { storedFavorites } = this.state;
+    return storedFavorites
+      .some(({ trackName }) => track === trackName);
+  };
+
+  favHandler = async ({ target: { name } }) => {
+    const { storedFavorites } = this.state;
     const { musicIndex } = this.props;
-    console.log(musicIndex);
 
-    const selectedSong = musicIndex.find(({ trackName }) => trackName === name);
+    const findSong = musicIndex
+      .find(({ trackName }) => trackName === name);
 
-    const selectedFav = Object.values(storedFavorites)
+    const findFav = storedFavorites
       .find((curr) => curr.trackName.includes(name));
 
-    this.setState({ favCheck: { ...favCheck, [name]: checked } });
-
-    if (selectedFav) {
-      this.remAddHandle(removeSong, selectedFav);
+    if (findFav) {
+      this.favHelper(removeSong, findFav);
     } else {
-      this.remAddHandle(addSong, selectedSong);
+      this.favHelper(addSong, findSong);
     }
   };
 
-  remAddHandle = async (remOrAdd = false, song = false) => {
+  favHelper = async (remOrAdd, song) => {
     this.setState({ isLoading: true });
     await remOrAdd(song);
     const response = await getFavoriteSongs();
@@ -57,7 +52,7 @@ export class MusicCard extends Component {
 
   render() {
     const { trackName, trackId, previewUrl } = this.props;
-    const { isLoading, favCheck } = this.state;
+    const { isLoading } = this.state;
 
     return (
       <div>
@@ -82,8 +77,8 @@ export class MusicCard extends Component {
                 type="checkbox"
                 name={ trackName }
                 id={ trackId }
-                onChange={ this.checkFavorite }
-                checked={ favCheck[trackName] || false }
+                onChange={ this.favHandler }
+                checked={ this.favChecker(trackName) || false }
               />
             </label>
           </div>
@@ -96,7 +91,11 @@ export class MusicCard extends Component {
 export default MusicCard;
 
 MusicCard.propTypes = {
-  musicIndex: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  musicIndex: PropTypes.arrayOf(PropTypes.shape({
+    trackName: PropTypes.string,
+    trackId: PropTypes.number,
+    previewUrl: PropTypes.string,
+  })).isRequired,
   trackName: PropTypes.string.isRequired,
   trackId: PropTypes.number.isRequired,
   previewUrl: PropTypes.string.isRequired,
