@@ -30,7 +30,7 @@ export class Favorites extends Component {
               <MusicCard
                 trackName={ trackName }
                 trackNumber={ trackNumber }
-                trackId={ trackId }
+                trackId={ Number(trackId) }
                 previewUrl={ previewUrl }
                 musicIndex={ storedFavs }
               />
